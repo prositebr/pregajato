@@ -51,7 +51,7 @@
         </button>
 
         <div id="errorMessage" class="mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden" role="alert">
-            <!-- Error message will be displayed here -->
+            <!-- Mensagem de erro será exibida aqui -->
         </div>
 
         <div id="sermonOutput" class="mt-8 bg-purple-50 p-6 rounded-lg shadow-inner border border-purple-200 hidden">
@@ -59,37 +59,37 @@
                 Em nome do Senhor Jesus
             </h2>
             <div id="biblePassageFullText" class="text-gray-900 leading-relaxed mb-4 p-4 border border-gray-300 rounded-lg bg-white">
-                <!-- Full Bible passage will be displayed here -->
+                <!-- Texto completo da passagem bíblica será exibido aqui -->
             </div>
             <div id="sermonContent" class="prose max-w-none text-gray-800 leading-relaxed">
-                <!-- Sermon content will be displayed here -->
+                <!-- Conteúdo do sermão será exibido aqui -->
             </div>
         </div>
     </div>
 
     <script>
-        // Get references to HTML elements
+        // Obter referências aos elementos HTML
         const themeInput = document.getElementById('themeInput');
         const generateSermonBtn = document.getElementById('generateSermonBtn');
         const sermonOutput = document.getElementById('sermonOutput');
         const sermonContent = document.getElementById('sermonContent');
         const errorMessage = document.getElementById('errorMessage');
-        const sermonTitleElement = document.getElementById('sermonTitle'); // Reference to the h2 title
-        const biblePassageFullTextElement = document.getElementById('biblePassageFullText'); // Reference to the full Bible passage div
+        const sermonTitleElement = document.getElementById('sermonTitle'); // Referência ao título h2
+        const biblePassageFullTextElement = document.getElementById('biblePassageFullText'); // Referência ao div da passagem bíblica completa
 
-        // Function to display error messages
+        // Função para exibir mensagens de erro
         const displayError = (element, message) => {
             element.textContent = message;
             element.classList.remove('hidden');
         };
 
-        // Function to hide error messages
+        // Função para ocultar mensagens de erro
         const hideError = (element) => {
             element.classList.add('hidden');
             element.textContent = '';
         };
 
-        // Function to show/hide loading indicator for sermon generation
+        // Função para mostrar/ocultar indicador de carregamento para geração do sermão
         const setLoadingSermon = (isLoading) => {
             if (isLoading) {
                 generateSermonBtn.disabled = true;
@@ -111,7 +111,7 @@
             }
         };
 
-        // Function to call the Gemini API and generate the sermon
+        // Função para chamar a API do Gemini e gerar o sermão
         const generateSermon = async () => {
             const theme = themeInput.value.trim();
             if (!theme) {
@@ -122,7 +122,7 @@
             setLoadingSermon(true);
             sermonOutput.classList.add('hidden');
             hideError(errorMessage);
-            sermonTitleElement.textContent = 'Em nome do Senhor Jesus'; // Ensure the fixed title is always displayed
+            sermonTitleElement.textContent = 'Em nome do Senhor Jesus'; // Garante que o título fixo seja sempre exibido
 
             const prompt = `Crie um roteiro de pregação completo em português para o tema '${theme}'. A pregação deve utilizar a versão da Bíblia João Ferreira de Almeida Revista e Corrigida (JFA ARC), ser de fácil compreensão, com linguagem simples e exemplos do dia a dia, acessível a pessoas de todas as formações. Se houver relevância, integre sensivelmente referências a eventos atuais de grande impacto global (como conflitos ou guerras) nas aplicações ou explicações, conectando a palavra à realidade vivida. O sermão deve ser um texto contínuo.
 
@@ -143,8 +143,10 @@ Depois da passagem bíblica completa, continue com as seguintes partes, sem nume
             chatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
             const payload = { contents: chatHistory };
-            const apiKey = "AIzaSyAqYxtYckocI1JrvWOiBalswjfbqatBYEE"; // ATENÇÃO: Substitua "GEMINI_API_KEY" pela sua própria chave de API do Google Gemini.
+            // ATENÇÃO: PARA QUE O APLICATIVO FUNCIONE FORA DO AMBIENTE DO GOOGLE AI STUDIO (ex: GitHub Pages),
+            // você precisará substituir "" (string vazia) pela sua própria chave de API REAL do Google Gemini.
             // Obtenha uma chave aqui: https://aistudio.google.com/app/apikey
+            const apiKey = "AIzaSyAqYxtYckocI1JrvWOiBalswjfbqatBYEE";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             try {
@@ -161,31 +163,31 @@ Depois da passagem bíblica completa, continue com as seguintes partes, sem nume
                     result.candidates[0].content.parts.length > 0) {
                     const text = result.candidates[0].content.parts[0].text;
                     
-                    // Regex to extract the full Bible passage text
+                    // Regex para extrair o texto completo da passagem bíblica
                     const fullPassageMatch = text.match(/(\*\*Passagem Bíblica:.+?\*\*)\s*<br \/>(.+?)(?=\*\*Pregação|\*\*Aplicações|\*\*Oração Final|$)/s);
 
-                    if (fullPassageMatch && fullPassageMatch[2]) { // fullPassageMatch[2] is the captured Bible text
-                        const passageReference = fullPassageMatch[1].trim(); // Captures the bolded reference line
+                    if (fullPassageMatch && fullPassageMatch[2]) { // fullPassageMatch[2] é o texto bíblico capturado
+                        const passageReference = fullPassageMatch[1].trim(); // Captura a linha de referência em negrito
                         let fullPassageContent = fullPassageMatch[2].trim();
 
-                        // Specific replacement for 1 Samuel 17:45 to match CCB wording if it's the passage
+                        // Substituição específica para 1 Samuel 17:45 para corresponder à redação da CCB
                         if (passageReference.includes("1 Samuel 17:45")) {
                             fullPassageContent = fullPassageContent.replace(/Então disse Davi ao filisteu/i, 'Disse pois Davi ao filisteu');
                         }
-                        // Specific replacement for Genesis 1:6
+                        // Substituição específica para Gênesis 1:6
                         if (passageReference.includes("Gênesis 1:6")) {
                             fullPassageContent = fullPassageContent.replace(/Haja firmamento no meio das águas, e haja separação entre águas e águas./i, 'Haja uma expansão no meio das águas, e haja separação entre águas e águas.');
                         }
 
 
-                        // Display the reference and then the full passage content, preserving line breaks
+                        // Exibir a referência e depois o conteúdo completo da passagem, preservando as quebras de linha
                         biblePassageFullTextElement.innerHTML = `${passageReference}<br/><br/>${fullPassageContent.replace(/\n/g, '<br />')}`;
                         
-                        // Remove the extracted parts from the main sermon content to avoid duplication
+                        // Remover as partes extraídas do conteúdo principal do sermão para evitar duplicação
                         const sermonWithoutPassage = text.replace(fullPassageMatch[0], '');
                         sermonContent.innerHTML = sermonWithoutPassage.replace(/\n/g, '<br />');
                     } else {
-                        // If full passage not found or format is unexpected, display the whole text in sermonContent and clear biblePassageFullText
+                        // Se a passagem completa não for encontrada ou o formato for inesperado, exibir todo o texto em sermonContent e limpar biblePassageFullText
                         biblePassageFullTextElement.innerHTML = '';
                         sermonContent.innerHTML = text.replace(/\n/g, '<br />');
                     }
@@ -203,14 +205,14 @@ Depois da passagem bíblica completa, continue com as seguintes partes, sem nume
             }
         };
 
-        // Add event listener to the button
+        // Adicionar listener de evento ao botão
         generateSermonBtn.addEventListener('click', generateSermon);
 
-        // Prevent Enter key from triggering the button click in the input field
+        // Prevenir que a tecla Enter dispare o clique do botão no campo de entrada
         themeInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                event.preventDefault(); // Prevent default form submission behavior
-                generateSermon(); // Manually trigger the sermon generation
+                event.preventDefault(); // Prevenir o comportamento padrão de envio do formulário
+                generateSermon(); // Disparar manualmente a geração do sermão
             }
         });
     </script>
